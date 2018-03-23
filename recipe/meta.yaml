@@ -65,7 +65,7 @@ test:
     {% endfor %}
 
     # Run included Python script.
-    - python event_rpcgen.py regress.rpc regress.gen.h regress.gen.c
+    - python event_rpcgen.py test/regress.rpc regress.gen.h regress.gen.c
 
 about:
   home: http://libevent.org/
