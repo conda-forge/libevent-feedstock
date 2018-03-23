@@ -29,9 +29,9 @@ test:
   requires:
     - python 2.*
 
-  files:
-    - {{ SRC_DIR }}/event_rpcgen.py
-    - {{ SRC_DIR }}/test/regress.rpc
+  source_files:
+    - event_rpcgen.py
+    - test/regress.rpc
 
   commands:
     # Check for headers.
@@ -65,7 +65,7 @@ test:
     {% endfor %}
 
     # Run included Python script.
-    - python event_rpcgen.py regress.rpc regress.gen.h regress.gen.c
+    - python event_rpcgen.py test/regress.rpc regress.gen.h regress.gen.c
 
 about:
   home: http://libevent.org/
