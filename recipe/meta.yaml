@@ -29,9 +29,9 @@ test:
   requires:
     - python 2.*
 
-  files:
-    - {{ SRC_DIR }}/event_rpcgen.py
-    - {{ SRC_DIR }}/test/regress.rpc
+  source_files:
+    - event_rpcgen.py
+    - test/regress.rpc
 
   commands:
     # Check for headers.
