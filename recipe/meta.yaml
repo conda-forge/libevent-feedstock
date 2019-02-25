@@ -1,4 +1,4 @@
-{% set version = "2.0.22" %}
+{% set version = "2.1.8" %}
 
 package:
   name: libevent
@@ -10,7 +10,7 @@ source:
   sha256: ab89639b0819befb1d8b293d52047c6955f8d1c9150c2b22a0e6247930eb9128
 
 build:
-  number: 1003
+  number: 0
   skip: True  # [win]
 
 requirements:
@@ -73,6 +73,7 @@ about:
   license_family: BSD
   license_file: LICENSE
   summary: An event notification library.
+  dev_url: https://github.com/libevent/libevent
 
 extra:
   recipe-maintainers:
