@@ -1,4 +1,4 @@
-{% set version = "2.1.8" %}
+{% set version = "2.1.10" %}
 
 package:
   name: libevent
@@ -7,10 +7,7 @@ package:
 source:
   fn: libevent-{{ version }}.tar.gz
   url: https://github.com/libevent/libevent/archive/release-{{ version }}-stable.tar.gz
-  sha256: 316ddb401745ac5d222d7c529ef1eada12f58f6376a66c1118eee803cb70f83d
-  patches:
-    - 0001-Port-event_rpcgen.py-to-py3.patch
-    - 0002-Add-missing-includes-into-openssl-compat.h.patch
+  sha256: 52c9db0bc5b148f146192aa517db0762b2a5b3060ccc63b2c470982ec72b9a79
 
 build:
   number: 0
@@ -19,9 +16,6 @@ build:
     - {{ pin_subpackage('libevent', max_pin='x.x') }}
 
 requirements:
-  host:
-    - openssl
-
   build:
     - pkg-config  # [unix]
     - autoconf    # [unix]
@@ -32,14 +26,15 @@ requirements:
     - make
     - {{ compiler('c') }}
     - openssl
-
+  host:
+    - openssl
   run:
     # Will be taken care of by run_exports
     # - openssl 1.0.*
 
 test:
   requires:
-    - python 2.7
+    - python 3.6
 
   source_files:
     - event_rpcgen.py
