@@ -19,4 +19,3 @@ openssl:
 pin_run_as_build:
   openssl:
     max_pin: x.x.x
-
