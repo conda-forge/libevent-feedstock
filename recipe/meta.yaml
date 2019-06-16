@@ -8,6 +8,8 @@ source:
   fn: libevent-{{ version }}.tar.gz
   url: https://github.com/libevent/libevent/archive/release-{{ version }}-stable.tar.gz
   sha256: 52c9db0bc5b148f146192aa517db0762b2a5b3060ccc63b2c470982ec72b9a79
+  patches:
+    - 0374b55942e533a3c3997439481a8d05d6c8f729.patch
 
 build:
   number: 0
@@ -34,7 +36,8 @@ requirements:
 
 test:
   requires:
-    - python 3.6
+    - python 2.7  # [win and vc<14]
+    - python 3.6  # [not (win and vc<14)]
 
   source_files:
     - event_rpcgen.py
