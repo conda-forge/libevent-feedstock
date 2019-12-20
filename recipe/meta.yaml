@@ -27,6 +27,7 @@ requirements:
     - {{ compiler('c') }}
     - openssl
   host:
+    - msinttypes  # [win and vc<14]
     - openssl
   run:
     # Will be taken care of by run_exports
