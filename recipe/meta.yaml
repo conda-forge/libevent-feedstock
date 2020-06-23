@@ -16,7 +16,7 @@ build:
   number: 1
   run_exports:
     # https://abi-laboratory.pro/tracker/timeline/libevent/
-    - {{ pin_subpackage('libevent', max_pin='x.x') }}
+    - {{ pin_subpackage('libevent', max_pin='x.x.x') }}
 
 requirements:
   build:
