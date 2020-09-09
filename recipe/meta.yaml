@@ -11,6 +11,7 @@ source:
   patches:
     - 0374b55942e533a3c3997439481a8d05d6c8f729.patch
     - 0001-Fix-destination-for-DLLs-lib-bin.patch
+    - build-with-no-undefined.patch  # [osx and arm64]
 
 build:
   number: 2

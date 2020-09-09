@@ -20,7 +20,7 @@ fi
 chmod +x ./autogen.sh
 
 ./autogen.sh
-./configure --prefix="${PREFIX}" --host="${HOST}" --disable-static
+./configure --prefix="${PREFIX}" --build=${BUILD} --host="${HOST}" --disable-static
 make -j${CPU_COUNT}
 
 #
