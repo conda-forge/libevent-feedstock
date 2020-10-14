@@ -5,9 +5,13 @@ Home: http://libevent.org/
 
 Package license: BSD-3-Clause
 
-Feedstock license: BSD-3-Clause
+Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/libevent-feedstock/blob/master/LICENSE.txt)
 
 Summary: An event notification library.
+
+Development: https://github.com/libevent/libevent
+
+Documentation: http://www.wangafu.net/~nickm/libevent-1.4/doxygen/html/
 
 The libevent API provides a mechanism to execute a callback function when
 a specific event occurs on a file descriptor or after a timeout has been
