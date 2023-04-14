@@ -31,9 +31,6 @@ requirements:
     - openssl
   host:
     - openssl
-  run:
-    # Will be taken care of by run_exports
-    # - openssl 1.0.*
 
 test:
   requires:
@@ -45,7 +42,7 @@ test:
 
   commands:
     # Check for headers.
-    - test -d "${PREFIX}/include/event2"  # [unix]
+    - test -d "${PREFIX}/include/event2"        # [unix]
     - if not exist %LIBRARY_INC%\event2 exit 1  # [win]
 
     # Check for libraries.
@@ -63,7 +60,7 @@ test:
     ] %}
 
     {% for each_lib in libs %}
-    - test ! -f "${PREFIX}/lib/{{ each_lib }}.a"             # [unix]
+    - test ! -f "${PREFIX}/lib/{{ each_lib }}.a"           # [unix]
     - test -f "${PREFIX}/lib/{{ each_lib }}.dylib"         # [osx]
     - test -f "${PREFIX}/lib/{{ each_lib }}.so"            # [linux]
     {% endfor %}
