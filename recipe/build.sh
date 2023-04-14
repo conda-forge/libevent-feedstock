@@ -13,5 +13,10 @@ cmake -G "Ninja" \
 
 cmake --build . --config Release --target install
 
+if [[ "$target_platform" == linux-* ]]; then
+    # delete static libs
+    rm $PREFIX/lib/libevent*.a
+fi
+
 # Remove Python script to avoid confusion and a Python dependency.
 rm -fv "${PREFIX}/bin/event_rpcgen.py"
