@@ -1,40 +1,29 @@
-{% set version = "2.1.10" %}
+{% set version = "2.1.12" %}
 
 package:
   name: libevent
   version: {{ version }}
 
 source:
-  fn: libevent-{{ version }}.tar.gz
-  url: https://github.com/libevent/libevent/archive/release-{{ version }}-stable.tar.gz
-  sha256: 52c9db0bc5b148f146192aa517db0762b2a5b3060ccc63b2c470982ec72b9a79
+  url: https://github.com/libevent/libevent/archive/refs/tags/release-{{ version }}-stable.tar.gz
+  sha256: 7180a979aaa7000e1264da484f712d403fcf7679b1e9212c4e3d09f5c93efc24
   patches:
-    - 0374b55942e533a3c3997439481a8d05d6c8f729.patch
-    - 0001-Fix-destination-for-DLLs-lib-bin.patch
-    - build-with-no-undefined.patch  # [osx and arm64]
+    - patches/0001-Fix-destination-for-DLLs-lib-bin.patch
+    - patches/0002-link-correct-libs.patch                 # [osx and arm64]
 
 build:
-  number: 4
+  number: 0
   run_exports:
     # https://abi-laboratory.pro/tracker/timeline/libevent/
     - {{ pin_subpackage('libevent', max_pin='x.x.x') }}
 
 requirements:
   build:
-    - pkg-config  # [unix]
-    - autoconf    # [unix]
-    - automake    # [unix]
-    - libtool     # [unix]
-    - cmake       # [win]
-    - m2-patch    # [win]
-    - make
     - {{ compiler('c') }}
-    - openssl
+    - cmake
+    - ninja
   host:
     - openssl
-  run:
-    # Will be taken care of by run_exports
-    # - openssl 1.0.*
 
 test:
   requires:
@@ -46,7 +35,7 @@ test:
 
   commands:
     # Check for headers.
-    - test -d "${PREFIX}/include/event2"  # [unix]
+    - test -d "${PREFIX}/include/event2"        # [unix]
     - if not exist %LIBRARY_INC%\event2 exit 1  # [win]
 
     # Check for libraries.
@@ -64,7 +53,7 @@ test:
     ] %}
 
     {% for each_lib in libs %}
-    - test ! -f "${PREFIX}/lib/{{ each_lib }}.a"             # [unix]
+    - test ! -f "${PREFIX}/lib/{{ each_lib }}.a"           # [unix]
     - test -f "${PREFIX}/lib/{{ each_lib }}.dylib"         # [osx]
     - test -f "${PREFIX}/lib/{{ each_lib }}.so"            # [linux]
     {% endfor %}
@@ -105,3 +94,5 @@ about:
 extra:
   recipe-maintainers:
     - jakirkham
+    - h-vetinari
+    - xhochy

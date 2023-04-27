@@ -1,34 +1,22 @@
 #!/bin/bash
+set -ex
 
-# Needed to ensure our OpenSSL and
-# not the system one is used on OS X.
-export LIBRARY_PATH="${PREFIX}/lib"
+mkdir build
+cd build
 
-export CFLAGS="-I${PREFIX}/include ${CFLAGS}"
-export CPPFLAGS="-I${PREFIX}/include ${CPPFLAGS}"
-export LDFLAGS="-L${PREFIX}/lib ${LDFLAGS}"
+cmake -G "Ninja" ${CMAKE_ARGS} \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_PREFIX_PATH=$PREFIX \
+    -DCMAKE_INSTALL_PREFIX=$PREFIX \
+    ..
 
-# Set the fallback library environment variable.
-if [[ "$(uname)" == "Darwin" ]];
-then
-    export LIBRARY_SEARCH_VAR=DYLD_FALLBACK_LIBRARY_PATH
-else
-    export LIBRARY_SEARCH_VAR=LD_LIBRARY_PATH
+cmake --build . --config Release --target install
+
+if [[ "$target_platform" == linux-* ]]; then
+    # delete static libs
+    rm $PREFIX/lib/libevent*.a
 fi
-
-
-chmod +x ./autogen.sh
-
-./autogen.sh
-./configure --prefix="${PREFIX}" --build=${BUILD} --host="${HOST}" --disable-static
-make -j${CPU_COUNT}
-
-#
-# Seems to hang on Mac builds. So have commented it for now.
-#
-#eval ${LIBRARY_SEARCH_VAR}="${PREFIX}/lib" make check
-
-make install
 
 # Remove Python script to avoid confusion and a Python dependency.
 rm -fv "${PREFIX}/bin/event_rpcgen.py"
