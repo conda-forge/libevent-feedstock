@@ -45,27 +45,18 @@ test:
 
     # Check for libraries.
     {% set libs = [
-        "libevent",
-        "libevent_core",
-        "libevent_extra",
-        "libevent_openssl",
-        "libevent_pthreads"
-    ] %}
-    {% set libs_win = [
-        "event",
-        "event_core",
-        "event_extra",
-    ] %}
+        "event", "event_core", "event_extra", "event_openssl"
+    ] + (not win) * ["event_pthreads"] %}
 
     {% for each_lib in libs %}
-    - test ! -f "${PREFIX}/lib/{{ each_lib }}.a"           # [unix]
-    - test -f "${PREFIX}/lib/{{ each_lib }}.dylib"         # [osx]
-    - test -f "${PREFIX}/lib/{{ each_lib }}.so"            # [linux]
-    {% endfor %}
+    # presence of shared libs
+    - test -f "${PREFIX}/lib/lib{{ each_lib }}.dylib"         # [osx]
+    - test -f "${PREFIX}/lib/lib{{ each_lib }}.so"            # [linux]
+    - if not exist "%LIBRARY_LIB%/{{ each_lib }}.lib" exit 1  # [win]
+    - if not exist "%LIBRARY_BIN%/{{ each_lib }}.dll" exit 1  # [win]
 
-    {% for each_lib in libs_win %}
-    - if not exist "%LIBRARY_PREFIX%/lib/{{ each_lib }}.lib" exit 1  # [win]
-    - if not exist "%LIBRARY_PREFIX%/bin/{{ each_lib }}.dll" exit 1  # [win]
+    # absence of static libs
+    - test ! -f "${PREFIX}/lib/lib{{ each_lib }}.a"           # [unix]
     {% endfor %}
 
     {% set pkgconfigs = [
