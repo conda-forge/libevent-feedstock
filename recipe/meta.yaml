@@ -10,9 +10,12 @@ source:
   patches:
     - patches/0001-Fix-destination-for-DLLs-lib-bin.patch
     - patches/0002-link-correct-libs.patch                 # [osx and arm64]
+    # libevent brings its own "Find myself" CMake setup; it only
+    # looks in $PREFIX/lib, but on windows the DLLs are in /bin...
+    - patches/0003-search-for-libs-PREFIX-bin.patch        # [win]
 
 build:
-  number: 0
+  number: 1
   run_exports:
     # https://abi-laboratory.pro/tracker/timeline/libevent/
     - {{ pin_subpackage('libevent', max_pin='x.x.x') }}
@@ -28,11 +31,17 @@ requirements:
 test:
   requires:
     - python *
-
+    # cmake needs compiler to be able to run package detection, see
+    # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
+    - {{ compiler('cxx') }}
+    - cmake
+    - ninja
+    - pkg-config
   source_files:
     - event_rpcgen.py
     - test/
-
+  files:
+    - cmake_test/
   commands:
     # Check for headers.
     - test -d "${PREFIX}/include/event2"        # [unix]
@@ -40,42 +49,30 @@ test:
 
     # Check for libraries.
     {% set libs = [
-        "libevent",
-        "libevent_core",
-        "libevent_extra",
-        "libevent_openssl",
-        "libevent_pthreads"
-    ] %}
-    {% set libs_win = [
-        "event",
-        "event_core",
-        "event_extra",
-    ] %}
+        "event", "event_core", "event_extra", "event_openssl"
+    ] + (not win) * ["event_pthreads"] %}
 
     {% for each_lib in libs %}
-    - test ! -f "${PREFIX}/lib/{{ each_lib }}.a"           # [unix]
-    - test -f "${PREFIX}/lib/{{ each_lib }}.dylib"         # [osx]
-    - test -f "${PREFIX}/lib/{{ each_lib }}.so"            # [linux]
-    {% endfor %}
+    # presence of shared libs
+    - test -f "${PREFIX}/lib/lib{{ each_lib }}.dylib"         # [osx]
+    - test -f "${PREFIX}/lib/lib{{ each_lib }}.so"            # [linux]
+    - if not exist "%LIBRARY_LIB%/{{ each_lib }}.lib" exit 1  # [win]
+    - if not exist "%LIBRARY_BIN%/{{ each_lib }}.dll" exit 1  # [win]
 
-    {% for each_lib in libs_win %}
-    - if not exist "%LIBRARY_PREFIX%/lib/{{ each_lib }}.lib" exit 1  # [win]
-    - if not exist "%LIBRARY_PREFIX%/bin/{{ each_lib }}.dll" exit 1  # [win]
-    {% endfor %}
+    # absence of static libs
+    - test ! -f "${PREFIX}/lib/lib{{ each_lib }}.a"           # [unix]
 
-    {% set pkgconfigs = [
-        "libevent",
-        "libevent_openssl",
-        "libevent_pthreads"
-    ] %}
-
-    # Check for pkg-config files.
-    {% for each_pkgconfig in pkgconfigs %}
-    - test -f "${PREFIX}/lib/pkgconfig/{{ each_pkgconfig }}.pc"  # [unix]
+    # pkg-config metadata
+    - pkg-config --print-errors --exact-version "{{ version }}" lib{{ each_lib }}
     {% endfor %}
 
     # Run included Python script.
     - python event_rpcgen.py test/regress.rpc test/regress.gen.h test/regress.gen.c
+
+    # CMake integration
+    - cd cmake_test
+    - cmake -GNinja $CMAKE_ARGS .   # [unix]
+    - cmake -GNinja %CMAKE_ARGS% .  # [win]
 
 about:
   home: http://libevent.org/
