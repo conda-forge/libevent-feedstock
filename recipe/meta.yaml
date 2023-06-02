@@ -28,11 +28,16 @@ requirements:
 test:
   requires:
     - python *
-
+    # cmake needs compiler to be able to run package detection, see
+    # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
+    - {{ compiler('cxx') }}
+    - cmake
+    - ninja
   source_files:
     - event_rpcgen.py
     - test/
-
+  files:
+    - cmake_test/
   commands:
     # Check for headers.
     - test -d "${PREFIX}/include/event2"        # [unix]
@@ -76,6 +81,11 @@ test:
 
     # Run included Python script.
     - python event_rpcgen.py test/regress.rpc test/regress.gen.h test/regress.gen.c
+
+    # CMake integration
+    - cd cmake_test
+    - cmake -GNinja $CMAKE_ARGS .   # [unix]
+    - cmake -GNinja %CMAKE_ARGS% .  # [win]
 
 about:
   home: http://libevent.org/
