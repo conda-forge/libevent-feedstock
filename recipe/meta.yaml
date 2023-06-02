@@ -33,6 +33,7 @@ test:
     - {{ compiler('cxx') }}
     - cmake
     - ninja
+    - pkg-config
   source_files:
     - event_rpcgen.py
     - test/
@@ -57,17 +58,9 @@ test:
 
     # absence of static libs
     - test ! -f "${PREFIX}/lib/lib{{ each_lib }}.a"           # [unix]
-    {% endfor %}
 
-    {% set pkgconfigs = [
-        "libevent",
-        "libevent_openssl",
-        "libevent_pthreads"
-    ] %}
-
-    # Check for pkg-config files.
-    {% for each_pkgconfig in pkgconfigs %}
-    - test -f "${PREFIX}/lib/pkgconfig/{{ each_pkgconfig }}.pc"  # [unix]
+    # pkg-config metadata
+    - pkg-config --print-errors --exact-version "{{ version }}" lib{{ each_lib }}
     {% endfor %}
 
     # Run included Python script.
