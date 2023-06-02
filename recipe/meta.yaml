@@ -10,9 +10,12 @@ source:
   patches:
     - patches/0001-Fix-destination-for-DLLs-lib-bin.patch
     - patches/0002-link-correct-libs.patch                 # [osx and arm64]
+    # libevent brings its own "Find myself" CMake setup; it only
+    # looks in $PREFIX/lib, but on windows the DLLs are in /bin...
+    - patches/0003-search-for-libs-PREFIX-bin.patch        # [win]
 
 build:
-  number: 0
+  number: 1
   run_exports:
     # https://abi-laboratory.pro/tracker/timeline/libevent/
     - {{ pin_subpackage('libevent', max_pin='x.x.x') }}

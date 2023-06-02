@@ -1,7 +1,7 @@
 From 68ece75d3ea49657c2ea09caefe331e4924beeb3 Mon Sep 17 00:00:00 2001
 From: "Uwe L. Korn" <uwe.korn@quantco.com>
 Date: Wed, 9 Sep 2020 15:12:12 +0200
-Subject: [PATCH 2/2] link correct libs
+Subject: [PATCH 2/3] link correct libs
 
 ---
  configure.ac | 2 +-
@@ -20,6 +20,3 @@ index d00e063a..76e3ee16 100644
  
  if test x$bwin32 = xtrue; then
    AC_HAVE_LIBRARY([ws2_32])
--- 
-2.38.1.windows.1
-
