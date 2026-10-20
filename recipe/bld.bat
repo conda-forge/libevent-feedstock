@@ -3,7 +3,7 @@
 :: Build
 mkdir build
 cd build
-cmake -G "Ninja" ^
+cmake %CMAKE_ARGS% -G "Ninja" ^
          -DBUILD_SHARED_LIBS=ON ^
          -DCMAKE_BUILD_TYPE=Release ^
          -DCMAKE_PREFIX_PATH=%LIBRARY_PREFIX% ^
