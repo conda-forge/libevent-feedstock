@@ -1,0 +1,81 @@
+schema_version: 1
+
+context:
+  version: "2.1.13"
+
+package:
+  name: libevent
+  version: ${{ version }}
+
+source:
+  url: https://github.com/libevent/libevent/archive/refs/tags/release-${{ version }}-stable.tar.gz
+  sha256: 1a0885e17dc78afbaeddf13cf849f9238bbc24acdc178464a0d1934d7c5ffbd5
+  patches:
+    - patches/0001-Fix-destination-for-DLLs-lib-bin.patch
+    - if: osx and arm64
+      then: patches/0002-link-correct-libs.patch
+    # libevent brings its own "Find myself" CMake setup; it only
+    # looks in $PREFIX/lib, but on windows the DLLs are in /bin...
+    - if: win
+      then: patches/0003-search-for-libs-PREFIX-bin.patch
+
+build:
+  number: 0
+
+requirements:
+  build:
+    - ${{ stdlib('c') }}
+    - ${{ compiler('c') }}
+    - cmake <4
+    - ninja
+  host:
+    - openssl
+  run_exports:
+    - ${{ pin_subpackage('libevent', upper_bound='x.x.x') }}
+
+tests:
+  - files:
+      recipe:
+        - cmake_test/
+        - run_test.py
+      source:
+        - event_rpcgen.py
+        - test/
+    requirements:
+      run:
+        - python *
+        - ${{ compiler('cxx') }}
+        - cmake
+        - ninja
+        - pkg-config
+    script:
+      - if: unix
+        then: test -d "${PREFIX}/include/event2"
+      - if: win
+        then: if not exist %LIBRARY_INC%\event2 exit 1
+      - python run_test.py
+      - python event_rpcgen.py test/regress.rpc test/regress.gen.h test/regress.gen.c
+      - cd cmake_test
+      - if: unix
+        then: cmake -GNinja $CMAKE_ARGS .
+      - if: win
+        then: cmake -GNinja %CMAKE_ARGS% .
+
+about:
+  license: BSD-3-Clause
+  license_file: LICENSE
+  description: |
+    The libevent API provides a mechanism to execute a callback function when
+    a specific event occurs on a file descriptor or after a timeout has been
+    reached. Furthermore, libevent also supports callbacks due to signals or
+    regular timeouts.
+  summary: An event notification library.
+  homepage: http://libevent.org/
+  repository: https://github.com/libevent/libevent
+  documentation: http://www.wangafu.net/~nickm/libevent-1.4/doxygen/html/
+
+extra:
+  recipe-maintainers:
+    - jakirkham
+    - h-vetinari
+    - xhochy
